@@ -16,14 +16,15 @@ import java.io.PrintWriter;
 
 
 
-public class FileLogger extends Observer {
+public class FileLogger implements Observer {
 	private PrintWriter pw;
+	
 	public FileLogger(String fileName) throws FileNotFoundException {
 		FileOutputStream fo = new FileOutputStream(fileName);
 		pw = new PrintWriter(fo);
 	}
 	
-	public FileLogger(Observable observable) {
+	public void report(Observable observable) {
 		pw.println(observable);
 		pw.flush();
 	}

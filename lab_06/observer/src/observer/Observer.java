@@ -12,8 +12,6 @@
 
 
 
-public class Observer {
-	public void report(Observable observable) {
-		
-	}
+interface Observer {
+	public void report(Observable observable);
 }

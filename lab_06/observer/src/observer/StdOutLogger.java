@@ -12,7 +12,7 @@
 
 
 
-public class StdOutLogger extends Observer {
+public class StdOutLogger implements Observer {
 	
 	public void report(Observable observable) {
 		System.out.println(observable);
