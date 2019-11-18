@@ -11,40 +11,53 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableRowSorter;
 
 /*
- * A megjelenÌtendı ablakunk oszt·lya.
+ * A megjelen√≠tend√µ ablakunk oszt√°lya.
  */
 public class StudentFrame extends JFrame {
     JTextField nameField;
     JTextField neptunField;
     /*
-     * Ebben az objektumban vannak a hallgatÛi adatok.
-     * A program indul·s ut·n betˆlti az adatokat f·jlbÛl, bez·r·skor pedig kimenti oda.
+     * Ebben az objektumban vannak a hallgat√≥i adatok.
+     * A program indul√°s ut√°n bet√∂lti az adatokat f√°jlb√≥l, bez√°r√°skor pedig kimenti oda.
      * 
-     * NE M”DOSÕTSD!
+     * NE M√ìDOS√çTSD!
      */
     private StudentData data;
     
     /*
-     * Itt hozzuk lÈtre Ès adjuk hozz· az ablakunkhoz a k¸lˆnbˆzı komponenseket
-     * (t·bl·zat, beviteli mezı, gomb).
+     * Itt hozzuk l√©tre √©s adjuk hozz√° az ablakunkhoz a k√ºl√∂nb√∂z√µ komponenseket
+     * (t√°bl√°zat, beviteli mez√µ, gomb).
      */
     private void initComponents() {
         this.setLayout(new BorderLayout());
         JTable table = new JTable(data);
         table.setFillsViewportHeight(true);
+        table.setRowSorter(new TableRowSorter<StudentData>(data));
+        
         this.add(new JScrollPane(table),BorderLayout.CENTER);
+        
+        table.setDefaultRenderer(String.class, new StudentTableCellRenderer(table.getDefaultRenderer(String.class)));
+        table.setDefaultRenderer(Number.class, new StudentTableCellRenderer(table.getDefaultRenderer(Number.class)));
+        table.setDefaultRenderer(Boolean.class, new StudentTableCellRenderer(table.getDefaultRenderer(Boolean.class)));
+        
         JPanel panel = new JPanel(new FlowLayout());
-        panel.add(new JLabel("NÈv:"));
+        
+        panel.add(new JLabel("N√©v:"));
         nameField = new JTextField(20);
         panel.add(nameField);
+        
         panel.add(new JLabel("Neptun:"));
         neptunField = new JTextField(6);
         panel.add(neptunField);
+        
         JButton button = new JButton("Felvesz");
         button.addActionListener(new MyActionListener());
         panel.add(button);
+        
         this.add(panel,BorderLayout.SOUTH);
 
     }
@@ -63,14 +76,14 @@ public class StudentFrame extends JFrame {
     /*
      * Az ablak konstruktora.
      * 
-     * NE M”DOSÕTSD!
+     * NE M√ìDOS√çTSD!
      */
     @SuppressWarnings("unchecked")
     public StudentFrame() {
-        super("HallgatÛi nyilv·ntart·s");
+        super("Hallgat√≥i nyilv√°ntart√°s");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         
-        // Indul·skor betˆltj¸k az adatokat
+        // Indul√°skor bet√∂ltj√ºk az adatokat
         try {
             data = new StudentData();
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream("students.dat"));
@@ -80,7 +93,7 @@ public class StudentFrame extends JFrame {
             ex.printStackTrace();
         }
         
-        // Bez·r·skor mentj¸k az adatokat
+        // Bez√°r√°skor mentj√ºk az adatokat
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -94,19 +107,49 @@ public class StudentFrame extends JFrame {
             }
         });
 
-        // FelÈpÌtj¸k az ablakot
+        // Fel√©p√≠tj√ºk az ablakot
         setMinimumSize(new Dimension(500, 200));
         initComponents();
     }
 
     /*
-     * A program belÈpÈsi pontja.
+     * A program bel√©p√©si pontja.
      * 
-     * NE M”DOSÕTSD!
+     * NE M√ìDOS√çTSD!
      */
     public static void main(String[] args) {
-        // MegjelenÌtj¸k az ablakot
+        // Megjelen√≠tj√ºk az ablakot
         StudentFrame sf = new StudentFrame();
         sf.setVisible(true);
     }
+    
+    public class StudentTableCellRenderer implements TableCellRenderer {
+
+   	 private TableCellRenderer renderer;
+
+   	 public StudentTableCellRenderer(TableCellRenderer defRenderer) {
+   		 this.renderer = defRenderer;
+   	 }
+   	 public Component getTableCellRendererComponent(JTable table,
+   			 Object value, boolean isSelected, boolean hasFocus,
+   			 int row, int column) {
+   			 Component component = renderer.getTableCellRendererComponent(
+   			 table, value, isSelected, hasFocus, row, column);
+   			 // Kikeress√ºk az √©ppen megjelen√≠tend≈ë hallgat√≥t a k√ºls≈ë,
+   			 // StudentFrame oszt√°ly data tagv√°ltoz√≥j√°b√≥l,
+   			 Student actualStudent = data.students.get(table.getRowSorter().convertRowIndexToModel(row));
+   			 // meg√°llap√≠tjuk, hogy buk√°sra √°ll-e vagy sem,
+   			 // √©s ez alapj√°n √°t√°ll√≠tjuk a komponens h√°tt√©rsz√≠n√©t:
+   			 // component.setBackground(...)
+   				if(!actualStudent.hasSignature() || actualStudent.getGrade()<=1) {
+   					component.setBackground(Color.RED);
+   				}
+   				else {
+   					component.setBackground(Color.GREEN);
+   				}
+
+   			 return component;
+   			 }
+   }
+
 }
