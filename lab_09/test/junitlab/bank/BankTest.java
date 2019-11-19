@@ -5,13 +5,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 import junitlab.bank.impl.FirstNationalBank;
+import junitlab.bank.impl.GreatSavingsBank;
 
 public class BankTest {
-	FirstNationalBank bank;
+	Bank bank;
 
 	@Before
 	public void setUp() {
-		bank = new FirstNationalBank();
+//		bank = new FirstNationalBank();
+		bank = new GreatSavingsBank();
 	}
 	
 	@Test
